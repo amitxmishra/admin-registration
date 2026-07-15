@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
-const User = require('../models/User');
+const User = require('../models/User')
+const jwt = require("jsonwebtoken");
 
-// handles signup
+
 async function signup(req, res) {
   try {
     const { username, email, phone, password } = req.body;
@@ -22,33 +23,57 @@ async function signup(req, res) {
   }
 }
 
-// handles login
 async function login(req, res) {
   try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(400).json({
+        message: "Invalid email or password"
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log(isMatch);
+
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(400).json({
+        message: "Invalid email or password"
+      });
     }
 
-    res.json({ message: 'Login successful' });
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        isAdmin: user.isAdmin
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d"
+      }
+    );
+
+    res.json({
+      message: "Login successful",
+      token
+    });
+
   } catch (err) {
-    res.status(500).json({ message: 'Something went wrong', error: err.message });
+    res.status(500).json({
+      message: "Something went wrong",
+      error: err.message
+    });
   }
 }
 
-// gets all users, for the admin panel
 async function getAllUsers(req, res) {
   try {
     const users = await User.find().select('-password');
+    
     res.json(users);
+  
   } catch (err) {
     res.status(500).json({ message: 'Something went wrong', error: err.message });
   }

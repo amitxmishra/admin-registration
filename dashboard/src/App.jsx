@@ -8,31 +8,42 @@ function App() {
   const [users, setUsers] = useState([])
   const [error, setError] = useState('')
 
-  function handleLogin(e) {
-    e.preventDefault()
+ async function handleLogin(e) {
+  try{
+      e.preventDefault()
 
-    axios.post('http://localhost:5000/api/login', { email, password })
-      .then((res) => {
+   const res = await axios.post('http://localhost:5000/api/login', { email, password })
         setToken(res.data.token)
         setError('')
         fetchUsers(res.data.token)
-      })
-      .catch((err) => {
-        console.log(err)
+        console.log("login",res);
+        
+  }catch(err){
+     console.log(err)
         setError('Login failed. Check email/password.')
-      })
+  }   
   }
 
-  function fetchUsers(authToken) {
-    axios.get('http://localhost:5000/api/admin/users', {
+
+
+
+  async function  fetchUsers (authToken) {
+try{
+  const res=await axios.get('http://localhost:5000/api/admin/users', {
       headers: { Authorization: `Bearer ${authToken}` }
     })
-      .then((res) => setUsers(res.data))
-      .catch((err) => {
-        console.log(err)
+
+    console.log("res",res)
+    setUsers(res.data)
+}catch(err){
+ console.log(err)
         setError('Failed to load users. Are you an admin?')
-      })
+}
   }
+
+
+
+
 
   if (!token) {
     return (

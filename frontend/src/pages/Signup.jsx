@@ -12,7 +12,6 @@ function Signup(props) {
   function handleSubmit(e) {
     e.preventDefault()
 
-    // backend not made yet so this will probably fail, will fix once backend is done
     axios.post('http://localhost:5000/api/signup', {
       userId: userId,
       username: username,
@@ -22,7 +21,7 @@ function Signup(props) {
     })
     .then(function (res) {
       console.log(res.data)
-      props.setPage('login')
+      window.location.href = 'http://localhost:5175'
     })
     .catch(function (err) {
       console.log(err)

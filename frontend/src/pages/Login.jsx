@@ -5,6 +5,7 @@ function Login(props) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -15,13 +16,22 @@ function Login(props) {
     })
     .then(function (res) {
       console.log(res.data)
-      
-      props.setPage('complete')
+      setSuccess(true)
+      setError('')
     })
     .catch(function (err) {
       console.log(err)
       setError('login failed, check console')
     })
+  }
+
+  if (success) {
+    return (
+      <div className="card">
+        <h2>Login Successful</h2>
+        <p>Welcome back!</p>
+      </div>
+    )
   }
 
   return (
